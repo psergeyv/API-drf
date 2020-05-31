@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Post, Comment, Group, Follow
+from .models import Post, Comment, Group, Follow, User
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -23,10 +23,31 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = ('id', 'title')
         model = Group
 
+
+
 class FollowSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
-    following = serializers.ReadOnlyField(source='following.username')
+    following = serializers.CharField(source='following.username')
 
     class Meta:
         fields = ('id', 'user', 'following')
-        model = Follow
+        model = Follow       
+
+    def validate(self, data): 
+        author = data['following']
+        following_user = User.objects.filter(username=author['username'])
+        if not following_user.exists():
+            raise serializers.ValidationError(f"Автор не найден {author['username']}") 
+
+        follow_user = User.objects.get(username=author['username'])
+        if self.context['request'].user == follow_user:
+            raise serializers.ValidationError(f"Нельзя подписаться на самого себя") 
+
+        followings = Follow.objects.filter(user=self.context['request'].user).filter(following=follow_user)
+        if followings.exists():
+            raise serializers.ValidationError(f"Вы уже подписаны на автора {follow_user.username}") 
+        
+        data['following'] = follow_user
+
+        return data
+    

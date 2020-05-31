@@ -17,7 +17,7 @@ from .permissions import IsOwnerOrReadOnly
 class PostList(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend,]
     filterset_class = PostFilter
 
@@ -67,22 +67,12 @@ class CommentsViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, post=self.get_post()) 
 
 class FollowViewSet(generics.ListCreateAPIView): 
+    queryset = Follow.objects.all()
     serializer_class = FollowSerializer 
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
-    search_fields = ['user__username',]
-    filterset_fields = ['following']
-
-    def get_author(self): 
-        username = self.request.query_params.get('following', None)
-        user = User.objects.filter(username=username)
-        if user:
-            return user.id
-        return None
-
-    def get_queryset(self):        
-        queryset = Follow.objects.all()
-        return queryset
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user, following=self.get_author()) 
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['=following__username', '=user__username']
+    
+    def perform_create(self, serializer):  
+        serializer.save(user=self.request.user) 
 

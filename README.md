@@ -7,16 +7,49 @@
 
 ## Получить список всех публикаций:
 ---------------------------------------
-    /api/v1/posts/
+    GET /api/v1/posts/
     
     QUERY PARAMETERS 
-    group - number ID группы
+    group - number (ID группы)
 
 
 ## Создать новую публикацию
 ---------------------------------------
-    /api/v1/posts/
-    method - POST
+    POST /api/v1/posts/    
 
-    QUERY PARAMETERS 
+    REQUEST BODY SCHEMA: application/json
     text - string (Текст поста)
+
+## Получить публикацию по id    
+---------------------------------------
+    GET /api/v1/posts/{id}/
+
+    PATH PARAMETERS
+    id - number (ID публикации)
+
+## Обновить публикацию по id
+---------------------------------------
+    PATCH /api/v1/posts/{id}/
+
+    PATH PARAMETERS
+    id required number (ID публикации)
+    
+    REQUEST BODY SCHEMA: application/json
+    text required string (Текст поста)
+
+## Частично обновить публикацию по id
+---------------------------------------
+    PUT /api/v1/posts/{id}/
+
+    PATH PARAMETERS    
+    id required number (ID публикации)
+    
+    REQUEST BODY SCHEMA: application/json
+    text required string (Текст поста)
+
+## Удалить публикацию по id
+---------------------------------------
+    DELETE /api/v1/posts/{id}/
+
+    PATH PARAMETERS
+    id required number (ID публикации)

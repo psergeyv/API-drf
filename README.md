@@ -7,16 +7,16 @@
 
 ## Получить список всех публикаций:
 ---------------------------------------
-/api/v1/posts/
+    /api/v1/posts/
+    
+    QUERY PARAMETERS 
+    group - number ID группы
 
-QUERY PARAMETERS 
-group - number ID группы
+
+## Создать новую публикацию
 ---------------------------------------
+    /api/v1/posts/
+    method - POST
 
-##Создать новую публикацию
----------------------------------------
-/api/v1/posts/
-method - POST
-
-QUERY PARAMETERS 
-text - string (Текст поста)
+    QUERY PARAMETERS 
+    text - string (Текст поста)

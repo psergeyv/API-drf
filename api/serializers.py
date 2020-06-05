@@ -27,30 +27,24 @@ class GroupSerializer(serializers.ModelSerializer):
 
 class FollowSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
-    following = serializers.CharField(source='following.username')
+    following = serializers.SlugRelatedField(
+        many=False,
+        slug_field='username',
+        queryset=User.objects.all())
 
     class Meta:
         fields = ('id', 'user', 'following')
         model = Follow
 
     def validate(self, data):
-        author = data['following']
-        following_user = User.objects.filter(username=author['username'])
-        if not following_user.exists():
-            raise serializers.ValidationError(
-                f"Автор не найден {author['username']}")
-
-        follow_user = User.objects.get(username=author['username'])
-        if self.context['request'].user == follow_user:
+        if self.context['request'].user == data['following']:
             raise serializers.ValidationError(
                 f"Нельзя подписаться на самого себя")
 
         followings = Follow.objects.filter(
-            user=self.context['request'].user).filter(following=follow_user)
+            user=self.context['request'].user).filter(following=data['following'])
         if followings.exists():
             raise serializers.ValidationError(
-                f"Вы уже подписаны на автора {follow_user.username}")
-
-        data['following'] = follow_user
+                f"Вы уже подписаны на автора {data['following']}")
 
         return data
